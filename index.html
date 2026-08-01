@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homemade — Recipes</title>
+
+<!--
+  DEPLOY NOTES
+  ------------
+  1. Put THIS file (index.html) and all recipe PDFs together in ONE folder,
+     e.g. a new /recipes folder in your GitHub repo. It will live at
+     scottachs.github.io/recipes/ and will NOT touch your landing page.
+  2. PDF file names below are CASE-SENSITIVE and must match exactly.
+  3. To ADD a recipe later: upload its PDF to the same folder, then add one
+     object to the RECIPES array at the bottom of this file. Nothing else
+     to touch — the page rebuilds itself from that list.
+  4. To rename the site: change the <h1> text below ("Homemade").
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:ital,wght@0,400..700;1,400;1,500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --field:      #16362a;   /* poblano — page ground */
+    --field-2:    #20493a;   /* raised green */
+    --field-line: rgba(241,232,212,0.16);
+
+    --card:       #f3ead6;   /* warm bone — recipe cards */
+    --card-edge:  #1b2c22;
+    --ink:        #1b2c22;   /* green-black text on bone */
+    --ink-dim:    #4d5b44;
+
+    --bone:       #f1e8d4;   /* text on the green field */
+    --bone-dim:   #b9c3a8;
+
+    --saffron:    #e4972a;   /* primary accent */
+    --chile:      #d14a25;   /* heat / action pop */
+    --lime:       #9dbe3b;   /* mild-heat + fresh */
+
+    --shadow:   7px 7px 0 rgba(9,22,16,0.35);
+    --shadow-h: 11px 11px 0 rgba(9,22,16,0.42);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(1100px 560px at 14% -12%, #1e4535, transparent 62%),
+      var(--field);
+    background-attachment:fixed;
+    color:var(--bone);
+    font-family:'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+    font-size:17px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .page{
+    max-width:880px;
+    margin:0 auto;
+    padding:clamp(28px,5vw,64px) clamp(18px,4vw,32px) 80px;
+  }
+
+  :focus-visible{ outline:3px solid var(--saffron); outline-offset:2px; border-radius:4px; }
+
+  /* ---------- Masthead ---------- */
+  .mast-top{
+    display:flex; justify-content:space-between; align-items:center;
+    gap:16px; margin-bottom:clamp(30px,7vw,58px);
+  }
+  .eyebrow{
+    font-size:12.5px; font-weight:600; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--saffron);
+  }
+  .home-link{
+    font-size:12.5px; letter-spacing:.03em; color:var(--bone-dim);
+    text-decoration:none; white-space:nowrap;
+    border-bottom:1px solid transparent; padding-bottom:1px;
+  }
+  .home-link:hover{ color:var(--bone); border-bottom-color:var(--saffron); }
+
+  h1.title{
+    font-family:'Bricolage Grotesque','Arial Black', system-ui, sans-serif;
+    font-weight:800; font-size:clamp(58px,15vw,118px); line-height:.88;
+    letter-spacing:-.025em; margin:0; color:var(--bone);
+  }
+  .tagline{
+    font-size:clamp(16px,2.4vw,19px); line-height:1.55;
+    color:var(--bone); opacity:.9; max-width:54ch; margin:20px 0 0;
+  }
+  .mast-rule{
+    display:flex; align-items:center; gap:16px;
+    margin-top:clamp(28px,5vw,40px);
+  }
+  .mast-rule .line{ flex:1; height:2px; background:var(--saffron); opacity:.9; }
+  .mast-rule .count{
+    font-size:12.5px; font-weight:600; letter-spacing:.13em;
+    text-transform:uppercase; color:var(--bone-dim); white-space:nowrap;
+  }
+
+  /* ---------- Category ---------- */
+  .cat{ margin-top:clamp(40px,6vw,58px); }
+  .cat-head{ display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+  .cat-name{
+    font-family:'Bricolage Grotesque', system-ui, sans-serif;
+    font-weight:700; font-size:15px; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--saffron);
+  }
+  .cat-line{ flex:1; height:1px; background:var(--field-line); }
+
+  /* ---------- Cards ---------- */
+  .stack{ display:flex; flex-direction:column; gap:16px; }
+  .card{
+    background:var(--card); color:var(--ink);
+    border:1.5px solid var(--card-edge); border-radius:12px;
+    box-shadow:var(--shadow); padding:clamp(20px,3.5vw,28px);
+    transition:transform .16s ease, box-shadow .16s ease;
+  }
+  .card:hover{ transform:translate(-3px,-3px); box-shadow:var(--shadow-h); }
+
+  .card-top{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:18px;
+  }
+  .title-btn{
+    font-family:'Bricolage Grotesque','Arial Black', system-ui, sans-serif;
+    font-weight:700; font-size:clamp(22px,3.4vw,28px); line-height:1.05;
+    letter-spacing:-.01em; color:var(--ink);
+    background:none; border:0; padding:0; margin:0; text-align:left; cursor:pointer;
+  }
+  .title-btn:hover{
+    color:var(--chile); text-decoration:underline;
+    text-decoration-thickness:2px; text-underline-offset:3px;
+  }
+
+  .r-note{
+    margin:12px 0 0; font-size:15.5px; line-height:1.55;
+    color:var(--ink); opacity:.92; max-width:62ch;
+  }
+
+  .card-bottom{
+    display:flex; justify-content:space-between; align-items:center;
+    gap:16px; margin-top:18px; flex-wrap:wrap;
+  }
+  .meta{
+    font-size:12.5px; font-weight:600; letter-spacing:.05em;
+    text-transform:uppercase; color:var(--ink-dim);
+  }
+  .actions{ display:flex; gap:10px; align-items:center; }
+  .btn{
+    font-family:inherit; font-weight:600; font-size:13.5px; letter-spacing:.02em;
+    border-radius:8px; cursor:pointer; border:1.5px solid var(--ink);
+    padding:9px 16px; transition:background .15s, color .15s;
+  }
+  .btn-primary{ background:var(--ink); color:var(--card); }
+  .btn-primary:hover{ background:var(--chile); border-color:var(--chile); }
+  .btn-ghost{
+    background:transparent; color:var(--ink); text-decoration:none;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn-ghost:hover{ background:var(--ink); color:var(--card); }
+
+  /* ---------- Heat meter (the signature) ---------- */
+  .heat{ display:flex; align-items:center; gap:9px; flex-shrink:0; }
+  .segs{ display:flex; gap:3px; }
+  .seg{
+    width:7px; height:17px; border-radius:2px;
+    border:1.5px solid var(--ink); background:transparent; opacity:.32;
+  }
+  .seg.on{ opacity:1; }
+  .heat--mild    .seg.on{ background:var(--lime);    border-color:var(--lime); }
+  .heat--medium  .seg.on{ background:var(--saffron); border-color:var(--saffron); }
+  .heat--hot     .seg.on,
+  .heat--serious .seg.on{ background:var(--chile);   border-color:var(--chile); }
+  .heat-label{
+    font-size:11px; font-weight:700; letter-spacing:.11em;
+    text-transform:uppercase; color:var(--ink-dim); white-space:nowrap;
+  }
+  .heat--none .heat-label{ opacity:.55; }
+
+  /* ---------- Preview modal ---------- */
+  .overlay{
+    position:fixed; inset:0; z-index:50;
+    background:rgba(9,22,16,0.72); backdrop-filter:blur(3px);
+    display:none; align-items:center; justify-content:center;
+    padding:clamp(10px,3vw,32px);
+  }
+  .overlay.open{ display:flex; }
+  .modal{
+    background:var(--card); color:var(--ink);
+    width:min(1000px,100%); height:min(90vh,100%);
+    border:1.5px solid var(--card-edge); border-radius:12px;
+    box-shadow:var(--shadow); display:flex; flex-direction:column; overflow:hidden;
+  }
+  .modal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; padding:14px 16px; border-bottom:1.5px solid var(--card-edge);
+    flex-shrink:0; flex-wrap:wrap;
+  }
+  .modal-title{
+    font-family:'Bricolage Grotesque', system-ui, sans-serif;
+    font-weight:700; font-size:18px; line-height:1.1; color:var(--ink);
+    margin:0; min-width:0;
+  }
+  .modal-actions{ display:flex; align-items:center; gap:8px; }
+  .link-sm{
+    font-size:13px; font-weight:600; letter-spacing:.02em;
+    color:var(--ink); text-decoration:none;
+    display:inline-flex; align-items:center; gap:5px;
+    border:1.5px solid var(--ink); border-radius:7px; padding:6px 12px;
+    transition:background .15s, color .15s;
+  }
+  .link-sm:hover{ background:var(--ink); color:var(--card); }
+  .icon-btn{
+    font-family:inherit; font-size:20px; line-height:1;
+    width:34px; height:34px; border-radius:7px; cursor:pointer;
+    background:transparent; color:var(--ink); border:1.5px solid var(--ink);
+    transition:background .15s, color .15s;
+  }
+  .icon-btn:hover{ background:var(--chile); color:var(--card); border-color:var(--chile); }
+  .frame-wrap{ flex:1; background:#fff; position:relative; }
+  .frame-wrap iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+
+  /* ---------- Footer ---------- */
+  .foot{
+    margin-top:clamp(48px,8vw,80px); padding-top:24px;
+    border-top:1px solid var(--field-line);
+    display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    font-size:12.5px; letter-spacing:.03em; color:var(--bone-dim);
+  }
+  .foot a{ color:var(--bone-dim); text-decoration:none; border-bottom:1px solid var(--field-line); }
+  .foot a:hover{ color:var(--saffron); border-bottom-color:var(--saffron); }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width:560px){
+    .card-top{ flex-direction:column; gap:14px; }
+    .actions{ width:100%; }
+    .btn{ flex:1; text-align:center; justify-content:center; }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ transition:none !important; animation:none !important; }
+    .card:hover{ transform:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="mast-top">
+    <span class="eyebrow">A working kitchen notebook</span>
+    <a class="home-link" href="https://scottachs.github.io">scottachs.github.io ↗</a>
+  </div>
+
+  <header>
+    <h1 class="title">Homemade</h1>
+    <p class="tagline">Recipes I actually cook, written down so I stop losing them. Tap any recipe to read the full card, or download the PDF to keep by the stove.</p>
+    <div class="mast-rule">
+      <span class="line"></span>
+      <span class="count"><span id="count">0</span> recipes</span>
+    </div>
+  </header>
+
+  <main id="index"></main>
+
+  <footer class="foot">
+    <span>Homemade — a personal recipe collection.</span>
+    <span>Part of <a href="https://scottachs.github.io">scottachs.github.io</a></span>
+  </footer>
+
+</div>
+
+<!-- Preview modal -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <div class="modal-actions">
+        <a class="link-sm" id="modalDownload" href="#" download>Download ↓</a>
+        <a class="link-sm" id="modalOpen" href="#" target="_blank" rel="noopener">Open ↗</a>
+        <button class="icon-btn" id="modalClose" aria-label="Close preview">×</button>
+      </div>
+    </div>
+    <div class="frame-wrap">
+      <iframe id="modalFrame" title="Recipe preview"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* =========================================================
+     RECIPES
+     ---------------------------------------------------------
+     To add a recipe: upload its PDF to this same folder, then
+     copy one block below and fill it in.
+
+       title:   display name
+       category: one of the CATEGORIES keys below
+       file:    exact PDF filename (case-sensitive)
+       note:    one plain sentence describing it
+       meta:    short chips shown under the note
+       heat:    0 = none, 1-2 = mild, 3 = medium, 4 = hot, 5 = serious
+     ========================================================= */
+
+  const CATEGORIES = [
+    { key: "chicken",   name: "Chicken" },
+    { key: "beef",      name: "Beef" },
+    { key: "salsa",     name: "Salsas" },
+    { key: "breakfast", name: "Breakfast" },
+  ];
+
+  const RECIPES = [
+    {
+      title: "Curry Chicken",
+      category: "chicken",
+      file: "Curry_Chicken_Mustard.pdf",
+      note: "Mister Mustard and a warm spice blend rubbed into the breast, rested, then baked hot and fast.",
+      meta: ["6 servings", "160 cal", "34g protein"],
+      heat: 0,
+    },
+    {
+      title: "Dijon Chicken",
+      category: "chicken",
+      file: "Dijon_Chicken_Recipe.pdf",
+      note: "Dijon does double duty as marinade and tenderizer. Best overnight, then seared and finished in the oven.",
+      meta: ["8 servings", "108 cal", "18g protein"],
+      heat: 0,
+    },
+    {
+      title: "Pepper Chicken",
+      category: "chicken",
+      file: "Pepper_Chicken_Recipe.pdf",
+      note: "Jalapeño, Thai chili, and habanero with peppers and cremini. Tame it over quinoa or in tortillas.",
+      meta: ["6 servings", "187 cal"],
+      heat: 4,
+    },
+    {
+      title: "Honey Chili Crisp Wings",
+      category: "chicken",
+      file: "Honey_Chili_Crisp_Wings.pdf",
+      note: "Baked low to render the fat, then blasted crisp. Tossed in Momofuku chili crisp, honey, and crumbled blue cheese.",
+      meta: ["Serves 3–4", "2 lbs"],
+      heat: 3,
+    },
+    {
+      title: "Habanero Braised Short Ribs",
+      category: "beef",
+      file: "Habanero_Braised_Short_Ribs.pdf",
+      note: "Birria-adjacent braise. Cumin–paprika crust, charred-habanero cola jus, three hours low and slow.",
+      meta: ["Serves 3", "3 hr braise"],
+      heat: 5,
+    },
+    {
+      title: "Aji Salsa",
+      category: "salsa",
+      file: "Aji_Salsa.pdf",
+      note: "Beefsteak tomato, cilantro, jalapeño, and Thai chili, brightened with fresh lime. Best the day you make it.",
+      meta: ["4 servings", "22 cal"],
+      heat: 3,
+    },
+    {
+      title: "Salsa",
+      category: "salsa",
+      file: "Salsa_Recipe.pdf",
+      note: "Tomato, scallion, cilantro, and Thai red pepper. Rests at least an hour so the salt and lime settle in.",
+      meta: ["10 servings", "15 cal"],
+      heat: 2,
+    },
+    {
+      title: "Overnight Oats",
+      category: "breakfast",
+      file: "Oatmeal_Overnight.pdf",
+      note: "Rolled oats, Greek yogurt, chia, flax, peanut butter, and raspberries. Assembled at night, ready by morning.",
+      meta: ["1 serving", "29g protein", "16g fiber"],
+      heat: 0,
+    },
+  ];
+
+  /* ---------- helpers ---------- */
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  function heatMeta(level){
+    if (level <= 0) return { label:"No heat", tier:"none" };
+    if (level <= 2) return { label:"Mild",    tier:"mild" };
+    if (level === 3) return { label:"Medium", tier:"medium" };
+    if (level === 4) return { label:"Hot",    tier:"hot" };
+    return { label:"Serious", tier:"serious" };
+  }
+
+  function heatMarkup(level){
+    const h = heatMeta(level);
+    let segs = "";
+    for (let i = 0; i < 5; i++){
+      segs += '<span class="seg' + (i < level ? " on" : "") + '"></span>';
+    }
+    return '<div class="heat heat--' + h.tier + '" role="img" aria-label="Heat: ' + h.label + '">' +
+             '<span class="segs">' + segs + '</span>' +
+             '<span class="heat-label">' + h.label + '</span>' +
+           '</div>';
+  }
+
+  function cardMarkup(r){
+    const file = esc(r.file);
+    const title = esc(r.title);
+    const meta = (r.meta || []).map(esc).join(" · ");
+    return '' +
+      '<article class="card">' +
+        '<div class="card-top">' +
+          '<button class="title-btn" data-preview data-file="' + file + '" data-title="' + title + '">' + title + '</button>' +
+          heatMarkup(r.heat || 0) +
+        '</div>' +
+        '<p class="r-note">' + esc(r.note) + '</p>' +
+        '<div class="card-bottom">' +
+          '<span class="meta">' + meta + '</span>' +
+          '<div class="actions">' +
+            '<button class="btn btn-primary" data-preview data-file="' + file + '" data-title="' + title + '">Preview</button>' +
+            '<a class="btn btn-ghost" href="' + file + '" download>Download ↓</a>' +
+          '</div>' +
+        '</div>' +
+      '</article>';
+  }
+
+  function render(){
+    const root = document.getElementById("index");
+    let html = "";
+    CATEGORIES.forEach(function(cat){
+      const items = RECIPES.filter(function(r){ return r.category === cat.key; });
+      if (!items.length) return;
+      html += '<section class="cat">' +
+                '<div class="cat-head"><span class="cat-name">' + esc(cat.name) + '</span><span class="cat-line"></span></div>' +
+                '<div class="stack">' + items.map(cardMarkup).join("") + '</div>' +
+              '</section>';
+    });
+    root.innerHTML = html;
+    document.getElementById("count").textContent = RECIPES.length;
+  }
+
+  /* ---------- preview modal ---------- */
+  const overlay = document.getElementById("overlay");
+  const frame = document.getElementById("modalFrame");
+  const mTitle = document.getElementById("modalTitle");
+  const mDownload = document.getElementById("modalDownload");
+  const mOpen = document.getElementById("modalOpen");
+  let lastFocus = null;
+
+  function openPreview(file, title){
+    lastFocus = document.activeElement;
+    mTitle.textContent = title;
+    mDownload.href = file;
+    mDownload.setAttribute("download", "");
+    mOpen.href = file;
+    frame.src = file + "#view=FitH";
+    overlay.classList.add("open");
+    document.body.style.overflow = "hidden";
+    document.getElementById("modalClose").focus();
+  }
+
+  function closePreview(){
+    overlay.classList.remove("open");
+    frame.src = "";
+    document.body.style.overflow = "";
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  document.getElementById("index").addEventListener("click", function(e){
+    const t = e.target.closest("[data-preview]");
+    if (t){ e.preventDefault(); openPreview(t.dataset.file, t.dataset.title); }
+  });
+  document.getElementById("modalClose").addEventListener("click", closePreview);
+  overlay.addEventListener("click", function(e){ if (e.target === overlay) closePreview(); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape" && overlay.classList.contains("open")) closePreview(); });
+
+  render();
+</script>
+
+</body>
+</html>
